@@ -3,4 +3,3 @@ __pycache__/
 *.pcap
 results/
 .DS_Store
-tutorials/
