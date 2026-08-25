@@ -10,7 +10,7 @@ The teaching package was developed for **COMP 3533: Network Infrastructure and S
 
 ## Original tutorial draft
 
-Joshua Wolfel's [original tutorial draft](tutorials/original-josh-draft/TLEG_lab%20(Repaired).docx) is preserved unchanged as a historical working document. It requires further technical and instructional verification before classroom use. Revised tutorial materials are still under development and are not included in this release.
+Joshua Wolfel's [original tutorial draft](tutorials/original-josh-draft/TLEG_lab.docx) is preserved unchanged as a historical working document. It requires further technical and instructional verification before classroom use. Revised tutorial materials are still under development and are not included in this release.
 
 ## How the tool works
 
