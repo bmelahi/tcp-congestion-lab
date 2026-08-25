@@ -1,4 +1,4 @@
-# Author: Joshua Woelfel
+# Author: Joshua Wolfel
 # jwolf083@mtroyal.ca
 
 from mininet.topo import Topo

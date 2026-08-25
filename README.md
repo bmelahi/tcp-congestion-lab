@@ -1,59 +1,85 @@
-# Congestion-Inspection
-Congestion Inspection is a python-based tool to analyze, inspect, and automate testing of TCP congestion control behavior in emulated network environments using Mininet and Linux-based network performance tools. This project was built using Mininet's provided Ubuntu VM, and may be incompatible in other environments. See dependency section for additional information.
+# TCP Congestion Lab
 
-## Usage
-Download and run as sudo:
+**Current version:** 1.0.0 (August 24, 2026)
+
+TCP Congestion Lab is a Mininet-based teaching tool for exploring TCP congestion control, buffering, latency, and competing flows. It creates a dumbbell topology with a shared bottleneck, generates TCP traffic with `iperf3`, samples round-trip time with `ping`, records sender-side TCP state through Linux `ftrace`, captures packets with `tcpdump`, and saves data and plots for analysis.
+
+The teaching package was developed for **COMP 3533: Network Infrastructure and Security** at Mount Royal University. It supports secure, controlled, hands-on experimentation without requiring administrative access to the campus network or a dedicated isolated hardware lab.
+
+> **Environment note:** The original implementation was developed and tested with Mininet 2.3.0 in the Mininet Ubuntu 20.04.1 virtual machine. Within the virtual machine, it requires root access and Linux kernel tracing interfaces. Newer distributions or kernels may require adaptation, especially if the `tcp_probe` tracepoint format differs.
+
+## How the tool works
+
+```text
+h1 ----\                         /---- h3
+        s1 == shared bottleneck == s2
+h2 ----/                         \---- h4
 ```
-sudo python3 cinspect.py
+
+For `-n 2`, `h1` sends to `h3` and `h2` sends to `h4`. Each pair has its own flow, but all flows compete on the centre link. The `DB_S` and `DB_L` presets both use a 10 Mb/s bottleneck; their bottleneck queue limits are 100 and 10,000 packets respectively.
+
+At runtime, `cinspect.py` builds the topology, creates a timestamped directory under `/home/mininet/results/`, runs a ping and TCP flow per pair, optionally assigns `reno`, `cubic`, or `bbr`, records packet captures and the kernel trace, exports CSV/PNG results, and stops Mininet after the plot window is closed.
+
+## Requirements
+
+- Linux with Mininet 2.3.0; the known-good baseline is the Mininet Ubuntu 20.04.1 VM
+- root privileges
+- `iperf3`, `iputils-ping`, `tcpdump`
+- mounted `debugfs` and the `tcp_probe` tracepoint
+- Python 3 packages: `pandas`, `matplotlib`, `parse`
+- a graphical session for the interactive plot window, or a suitable Matplotlib backend
+
+Check available congestion algorithms with:
+
+```bash
+sysctl net.ipv4.tcp_available_congestion_control
 ```
 
-## Collected Metrics
-Each run of cinspect.py will generate a new directory with results for the following: 
+## Quick start
 
-**Round Trip Time (RTT):** Congestion Inspection begins by periodically recording the Round Trip Time (RTT) between each host pair using the _ping_ utility.
+```bash
+git clone https://github.com/bmelahi/tcp-congestion-lab.git
+cd tcp-congestion-lab
+sudo python3 -m pip install -r requirements.txt
+sudo mkdir -p /home/mininet/results
+sudo python3 cinspect.py -t 20 -n 2 -a cubic,reno -d 0,5 -l DB_S
+```
 
-**TCP Flow Information:** _iperf3_ is used to generate the TCP flow between each host pair. 
+Close the Matplotlib windows after inspection so the script can clean up Mininet. After an interrupted run:
 
-**CWND, SSTHRESH, SRTT, etc.:** Linux's ftrace framework is used to collect various internal kernel information like congestion window size using the _tcp__probe_ tracepoint.
+```bash
+sudo mn -c
+```
 
-**Packet capture:** _tcpdump_ is used to generate packet capture files of each tcp flow.
+## Command options
 
-## Options
-**-t** _N_
+| Option | Meaning | Constraints |
+|---|---|---|
+| `-t N` | Flow duration in seconds | Positive integer; default `5` |
+| `-l NAME` | Link preset | `DB_S` or `DB_L`; default `DB_S` |
+| `-n N` | Number of sender/receiver pairs | Positive integer; default `1` |
+| `-a a1,a2,...` | Sender algorithms, in pair order | `reno`, `cubic`, `bbr` |
+| `-d d1,d2,...` | Start delays, in pair order | Non-negative seconds; decimals allowed |
 
-  specify how long the flow between the host pairs should last
-  
-**-l** _config_ 
+For reproducible experiments, provide one algorithm and one delay per pair.
 
-  specify the link configuration to use (see Topology section for more info)
+## Results
 
-**-n** _N_ 
-  
-  specify the number of host pairs connected through the center link
+Each pair directory contains `ping.txt`, `ping.csv`, `iperf.txt`, `ftrace.csv`, and `graph.png`. The run directory also contains `ftrace_raw.txt` and one sender-side `.pcap` per flow. `ping.csv` contains `Time` and `RTT`; `ftrace.csv` contains `Time`, `SSThresh`, `CWND`, and `SRTT`. Throughput is reported in `iperf.txt`.
 
-**-a** _a1,a2,...,aN_
+## Known limitations
 
-  specify the congestion control algorithm of the sender of each host pair
+- Output is hard-coded to `/home/mininet/results/`.
+- The trace parser uses fixed field positions from the Ubuntu 20.04.1 `tcp_probe` format.
+- Error messages mention `-h`, but a help flag is not implemented.
+- `bbr` may be accepted by the parser but unavailable in the kernel.
+- An exception before normal shutdown can leave Mininet or tracing state behind.
+- The interactive plot blocks normal teardown until closed.
 
-**-d** _d1,d2,...,dN_
+## Attribution and support
 
-  specify the delay before each host pair begins its flow
+The original software was developed by **Joshua Wolfel**. Tutorial development and project work were conducted under the supervision of **Maryam Elahi, Mount Royal University**. This project was supported by a **Provost's Teaching and Learning Enhancement Grant**. See [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md).
 
-### Mininet Topology
-The topology of the network is found in dumbell.py, with the link bandwidths, delays, and buffer sizes customizable using the **LINK_CONFIG** dictionary. Specify the link config using the **-l** option followed by the desired **LINK_CONFIG** key.
+## License
 
-## Dependencies
-Congestion Inspection was built using [Mininet 2.3.0](https://github.com/mininet/mininet/releases/) using their provided Ubuntu 20.04.1 VM image. See Mininet's [install docs](https://github.com/mininet/mininet/blob/master/INSTALL) for more information.
-Additional Linux tools required:
-- [iperf3](https://iperf.fr/)
-- [ping](https://man7.org/linux/man-pages/man8/ping.8.html)
-- [tcpdump](https://www.tcpdump.org/)
-- [ftrace](https://www.kernel.org/doc/html/latest/trace/ftrace.html) (tcp_probe tracepoint) based on Ubuntu 20.04.1 
-
-Python dependencies:
-- [pandas](https://pandas.pydata.org/)
-- [matplotlib](https://matplotlib.org/)
-- [parse](https://pypi.org/project/parse/)
-
-## Contact
-Contact joshua.woelfel@gmail.com for any inquiries.
+Distributed under the [MIT License](LICENSE). Copyright (c) 2024 Maryam Elahi.

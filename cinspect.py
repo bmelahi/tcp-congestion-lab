@@ -1,4 +1,4 @@
-# Author: Joshua Woelfel
+# Author: Joshua Wolfel
 # jwolf083@mtroyal.ca
 
 from mininet.net import Mininet
