@@ -8,9 +8,9 @@ The teaching package was developed for **COMP 3533: Network Infrastructure and S
 
 > **Environment note:** The original implementation was developed and tested with Mininet 2.3.0 in the Mininet Ubuntu 20.04.1 virtual machine. Within the virtual machine, it requires root access and Linux kernel tracing interfaces. Newer distributions or kernels may require adaptation, especially if the `tcp_probe` tracepoint format differs.
 
-## Original tutorial draft
+## Original project drafts
 
-Joshua Wolfel's [original tutorial draft](tutorials/original-josh-draft/TLEG_lab.docx) is preserved unchanged as a historical working document. It requires further technical and instructional verification before classroom use. Revised tutorial materials are still under development and are not included in this release.
+Joshua Wolfel's original [tutorial draft](tutorials/original-josh-draft/TLEG_lab.docx) and [VM and Python setup notes](tutorials/original-josh-draft/support/) are preserved as historical working documents. They require further technical and instructional verification before classroom use. Revised tutorial materials are still under development and are not included in this release.
 
 ## How the tool works
 

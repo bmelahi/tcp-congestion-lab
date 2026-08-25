@@ -9,5 +9,5 @@ First public release of the tool under the TCP Congestion Lab name.
 - Includes the original Mininet-based Congestion Inspection tool.
 - Documents installation requirements, output files, limitations, and troubleshooting guidance.
 - Includes acknowledgements, MIT licence, and dissemination material from Mount Royal University Research Days.
-- Preserves Joshua Wolfel's original tutorial draft as an unverified historical working document.
+- Preserves Joshua Wolfel's original tutorial draft and VM/Python setup notes as unverified historical working documents.
 - Revised tutorial and lab materials remain under development and are not included in this release.
